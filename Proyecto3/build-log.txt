@@ -1,0 +1,215 @@
+===========================================================
+Construyendo y pusheando todas las imágenes de Docker a Zot
+===========================================================
+Building Rust API...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  916.3MB
+Step 1/13 : FROM rust:1.83 as builder
+ ---> 6440c73bd6ca
+Step 2/13 : WORKDIR /usr/src/app
+ ---> Using cache
+ ---> 2ce104ecbdf1
+Step 3/13 : COPY Cargo.toml Cargo.lock ./
+ ---> Using cache
+ ---> 98828f1cf547
+Step 4/13 : COPY src ./src
+ ---> Using cache
+ ---> f40091b2f08e
+Step 5/13 : RUN cargo build --release
+ ---> Using cache
+ ---> 2797b1d54461
+Step 6/13 : FROM debian:bookworm-slim
+ ---> 31b141c0ca6b
+Step 7/13 : RUN apt-get update && apt-get install -y     ca-certificates     && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 19417090b8ed
+Step 8/13 : WORKDIR /app
+ ---> Using cache
+ ---> 72084c033017
+Step 9/13 : COPY --from=builder /usr/src/app/target/release/rust-api /app/rust-api
+ ---> Using cache
+ ---> b796bf2e507a
+Step 10/13 : ENV PORT=8000
+ ---> Using cache
+ ---> f8e7ec4e8fc7
+Step 11/13 : ENV GO_SERVICE_URL=http://go-grpc-client:8080/tweet
+ ---> Using cache
+ ---> c9f4260adc22
+Step 12/13 : EXPOSE 8000
+ ---> Using cache
+ ---> bcb5adf56fca
+Step 13/13 : CMD ["./rust-api"]
+ ---> Using cache
+ ---> b49a73a9a5c5
+Successfully built b49a73a9a5c5
+Successfully tagged 34.70.157.232:5000/rust-api:latest
+The push refers to repository [34.70.157.232:5000/rust-api]
+ee6a5a85d7ce: Preparing
+cc43eb2a5785: Preparing
+9d61b2912332: Preparing
+d6d0586ce802: Preparing
+ee6a5a85d7ce: Layer already exists
+9d61b2912332: Layer already exists
+cc43eb2a5785: Layer already exists
+d6d0586ce802: Layer already exists
+latest: digest: sha256:1859b5ddec3b119e804754e5454f8cc1c59650931036126d88406ccc6e46363c size: 1157
+Building Go gRPC Client...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  27.14kB
+Step 1/15 : FROM golang:1.22-alpine AS builder
+1.22-alpine: Pulling from library/golang
+1f3e46996e29: Pulling fs layer
+4d75fd4b7386: Pulling fs layer
+afa154b433c7: Pulling fs layer
+5f837c998576: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+5f837c998576: Waiting
+4f4fb700ef54: Waiting
+1f3e46996e29: Verifying Checksum
+1f3e46996e29: Download complete
+4d75fd4b7386: Download complete
+1f3e46996e29: Pull complete
+4d75fd4b7386: Pull complete
+4f4fb700ef54: Download complete
+5f837c998576: Download complete
+afa154b433c7: Verifying Checksum
+afa154b433c7: Download complete
+afa154b433c7: Pull complete
+5f837c998576: Pull complete
+4f4fb700ef54: Pull complete
+Digest: sha256:1699c10032ca2582ec89a24a1312d986a3f094aed3d5c1147b19880afe40e052
+Status: Downloaded newer image for golang:1.22-alpine
+ ---> 4129f51f28c9
+Step 2/15 : WORKDIR /app
+ ---> Running in 2322d9053216
+ ---> Removed intermediate container 2322d9053216
+ ---> b41d5ffe2f57
+Step 3/15 : COPY go.mod go.sum ./
+ ---> d38f09b00419
+Step 4/15 : RUN go mod download
+ ---> Running in 872e7eedd66e
+[91mgo: golang.org/x/net@v0.42.0: module golang.org/x/net@v0.42.0 requires go >= 1.23.0 (running go 1.22.12; GOTOOLCHAIN=local)
+[0mThe command '/bin/sh -c go mod download' returned a non-zero code: 1
+The push refers to repository [34.70.157.232:5000/go-grpc-client]
+An image does not exist locally with the tag: 34.70.157.232:5000/go-grpc-client
+Building Go Kafka Writer...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  38.91kB
+Step 1/14 : FROM golang:1.22-alpine AS builder
+ ---> 4129f51f28c9
+Step 2/14 : WORKDIR /app
+ ---> Using cache
+ ---> b41d5ffe2f57
+Step 3/14 : COPY go.mod go.sum ./
+ ---> a532ebac9867
+Step 4/14 : RUN go mod download
+ ---> Running in 2e4126c1b55a
+[91mgo: github.com/IBM/sarama@v1.46.2: module github.com/IBM/sarama@v1.46.2 requires go >= 1.24.0 (running go 1.22.12; GOTOOLCHAIN=local)
+[0mThe command '/bin/sh -c go mod download' returned a non-zero code: 1
+The push refers to repository [34.70.157.232:5000/go-kafka-writer]
+An image does not exist locally with the tag: 34.70.157.232:5000/go-kafka-writer
+Building Go RabbitMQ Writer...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  27.65kB
+Step 1/14 : FROM golang:1.22-alpine AS builder
+ ---> 4129f51f28c9
+Step 2/14 : WORKDIR /app
+ ---> Using cache
+ ---> b41d5ffe2f57
+Step 3/14 : COPY go.mod go.sum ./
+ ---> 8c29afb04771
+Step 4/14 : RUN go mod download
+ ---> Running in 55e6f07ccb62
+[91mgo: golang.org/x/net@v0.42.0: module golang.org/x/net@v0.42.0 requires go >= 1.23.0 (running go 1.22.12; GOTOOLCHAIN=local)
+[0mThe command '/bin/sh -c go mod download' returned a non-zero code: 1
+The push refers to repository [34.70.157.232:5000/go-rabbitmq-writer]
+An image does not exist locally with the tag: 34.70.157.232:5000/go-rabbitmq-writer
+Building Kafka Consumer...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  19.46kB
+Step 1/13 : FROM golang:1.22-alpine AS builder
+ ---> 4129f51f28c9
+Step 2/13 : WORKDIR /app
+ ---> Using cache
+ ---> b41d5ffe2f57
+Step 3/13 : COPY go.mod go.sum ./
+ ---> faa149b6183a
+Step 4/13 : RUN go mod download
+ ---> Running in 386b46981318
+[91mgo: golang.org/x/crypto@v0.43.0: module golang.org/x/crypto@v0.43.0 requires go >= 1.24.0 (running go 1.22.12; GOTOOLCHAIN=local)
+[0mThe command '/bin/sh -c go mod download' returned a non-zero code: 1
+The push refers to repository [34.70.157.232:5000/kafka-consumer]
+An image does not exist locally with the tag: 34.70.157.232:5000/kafka-consumer
+Building RabbitMQ Consumer...
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  9.728kB
+Step 1/13 : FROM golang:1.22-alpine AS builder
+ ---> 4129f51f28c9
+Step 2/13 : WORKDIR /app
+ ---> Using cache
+ ---> b41d5ffe2f57
+Step 3/13 : COPY go.mod go.sum ./
+ ---> 56d7dd6b2ab5
+Step 4/13 : RUN go mod download
+ ---> Running in 7cb1c19fc8bc
+ ---> Removed intermediate container 7cb1c19fc8bc
+ ---> 317046b2ad01
+Step 5/13 : COPY . .
+ ---> 4fb46405cf89
+Step 6/13 : RUN go build -o rabbitmq-consumer main.go
+ ---> Running in d6698a1288f9
+ ---> Removed intermediate container d6698a1288f9
+ ---> e1ca3a576d5a
+Step 7/13 : FROM alpine:latest
+ ---> 9234e8fb04c4
+Step 8/13 : RUN apk --no-cache add ca-certificates
+ ---> Using cache
+ ---> e04170cc4c2d
+Step 9/13 : WORKDIR /root/
+ ---> Using cache
+ ---> 7914d6effc3f
+Step 10/13 : COPY --from=builder /app/rabbitmq-consumer .
+ ---> 5bfcb0cb99b8
+Step 11/13 : ENV RABBITMQ_URL=amqp://guest:guest@rabbitmq-service:5672/
+ ---> Running in 50d06de7d7ad
+ ---> Removed intermediate container 50d06de7d7ad
+ ---> e3cf5b6a2d29
+Step 12/13 : ENV VALKEY_ADDR=valkey-service:6379
+ ---> Running in 33dce085eded
+ ---> Removed intermediate container 33dce085eded
+ ---> ab3a770e60fe
+Step 13/13 : CMD ["./rabbitmq-consumer"]
+ ---> Running in 8931db628059
+ ---> Removed intermediate container 8931db628059
+ ---> 1e0376881211
+Successfully built 1e0376881211
+Successfully tagged 34.70.157.232:5000/rabbitmq-consumer:latest
+The push refers to repository [34.70.157.232:5000/rabbitmq-consumer]
+817c6015f3aa: Preparing
+c4132be0779d: Preparing
+418dccb7d85a: Preparing
+c4132be0779d: Layer already exists
+418dccb7d85a: Layer already exists
+817c6015f3aa: Pushed
+latest: digest: sha256:2186a84d6467ce00c31235b567f8db797c0b9382db2e23776fd8713190e2254d size: 949
+==============================================================
+Todas las imágenes se subieron y pushearon satisfactoriamente!
+==============================================================

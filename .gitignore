@@ -1,0 +1,12 @@
+# Proyecto 2 - Grafana data
+proyecto-2/dashboard/grafana-data/
+proyecto-2/dashboard/grafana-data/**
+
+# Proyecto 3 - Build artifacts
+Proyecto3/rust-api/target/
+Proyecto3/**/target/
+Proyecto3/**/grpc-client
+Proyecto3/**/kafka-writer
+Proyecto3/**/rabbitmq-writer
+Proyecto3/**/kafka-consumer
+Proyecto3/**/rabbitmq-consumer

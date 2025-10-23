@@ -1,0 +1,28 @@
+persistence:
+  enabled: true
+  size: 1Gi
+
+adminUser: admin
+adminPassword: admin123
+
+service:
+  type: LoadBalancer
+  port: 80
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Valkey
+      type: redis-datasource
+      access: proxy
+      url: valkey-service:6379
+      isDefault: true
+      jsonData:
+        client: standalone
+
+plugins:
+  - redis-datasource
+
+env:
+  GF_INSTALL_PLUGINS: redis-datasource
